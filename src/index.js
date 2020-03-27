@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import Countdown from './Countdown';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Countdown deadline="Apr 14, 2020 00:00:00"/>
   </React.StrictMode>,
   document.getElementById('root')
 );
