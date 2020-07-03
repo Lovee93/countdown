@@ -1,128 +1,86 @@
 import React, { Component } from 'react';
 import './App.css';
+import dateFormat from 'dateformat';
 
 class Countdown extends Component {
   
   constructor() {
     super();
     this.state = {
-      days: undefined,
-      hours: undefined,
-      minutes: undefined,
-      seconds: undefined
+      newDate: new Date('1.1.2021').getTime(), 
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
     };
   };
-
-   componentDidMount() {
-    this.interval = setInterval(() => {
-      const { deadline } = this.props;
-      const then = new Date(deadline).getTime();
-      const now = new Date().getTime();
-      const countdown = then-now;
-      const days = Math.floor(countdown / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((countdown%(1000 * 60 * 60 * 24))/(1000 * 60 * 60));
-      const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((countdown % (1000 * 60)) / 1000);   
-
-      this.setState({ days, hours, minutes, seconds });
-    }, 1000);
-   }
   
-  componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
+  timer = 0;    
+  
+  componentDidMount = () => {
+    this.timer = setInterval(() => {
+      this.updateTimer(); 
+    }, 1000);
+  }
+
+  componentWillUnmount = () => {
+    clearInterval(this.timer);
+  }
+
+  calcTime(event) {
+    const calDate = event.target.value
+    if(typeof(calDate) !== 'undefined') {
+      this.setState({newDate: new Date(calDate).getTime()});
     }
   }
 
+  updateTimer = () => {
+    var { days, hours, minutes, seconds } = this.state;
+
+    var now = new Date().getTime();
+    var distance = this.state.newDate - now;
+
+    // Time calculations for days, hours, minutes and seconds
+    this.setState({
+      days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((distance % (1000 * 60)) / 1000),
+    })
+  } 
+
   render() {
-    const { days, hours, minutes, seconds } = this.state;
-    // Mapping the date values to radius values
-    const daysRadius = mapNumber(days, 30, 0, 0, 360);
-    const hoursRadius = mapNumber(hours, 24, 0, 0, 360);
-    const minutesRadius = mapNumber(minutes, 60, 0, 0, 360);
-    const secondsRadius = mapNumber(seconds, 60, 0, 0, 360);
-    
+    var { days, hours, minutes, seconds, newDate } = this.state
+    var now = new Date().getTime();
     return (
       <div className="App">
         <header className="App-header">
-          <h1>Time left to upskill: </h1>
+          <h1>Time Left</h1>
+          <div className="clock-input">
+            <input type="date" name="time-to" className="time-to" id="time-to" value={dateFormat(newDate, 'yyyy-mm-dd')} onChange={(event) => this.calcTime(event)} />
+          </div> <br/><br/>
           <div className="wrapper"> 
-            <div className="items"> 
-                <SVGCircle radius={daysRadius} />
-                {days} 
-              <div>Days</div>
+            <div className="clock-column">
+              <p className="clock-day clock-timer">{newDate>now ? days : 'D'}</p>
+              <p className="clock-label">Days</p>
             </div>
-            <div className="items"> 
-              <SVGCircle radius={hoursRadius} />
-              {hours} 
-              <div>Hours</div>
+            <div className="clock-column">
+              <p className="clock-hours clock-timer">{newDate>now ? hours : 'O'}</p>
+              <p className="clock-label">Hours</p>
             </div>
-            <div className="items"> 
-              <SVGCircle radius={minutesRadius} />
-              {minutes} 
-              <div>Minutes</div>
+            <div className="clock-column">
+              <p className="clock-minutes clock-timer">{newDate>now ? minutes : 'N'}</p>
+              <p className="clock-label">Minutes</p>
             </div>
-            <div className="items"> 
-              <SVGCircle radius={secondsRadius} />
-              {seconds} 
-              <div>Seconds</div>
+            <div className="clock-column">
+              <p className="clock-seconds clock-timer">{newDate>now ? seconds : 'E'}</p>
+              <p className="clock-label">Seconds</p>
             </div>
           </div>
         </header>
       </div>
     );
   }
-}
-
-const SVGCircle = ({ radius }) => (
-    <svg className="countdown-svg">
-        <path
-            fill="none"
-            stroke="white"
-            stroke-width="4"
-            d={describeArc(50, 50, 48, 0, radius)}
-        />
-    </svg>
-);
-
-// From StackOverflow: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
-function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
-
-    return {
-        x: centerX + radius * Math.cos(angleInRadians),
-        y: centerY + radius * Math.sin(angleInRadians)
-    };
-}
-
-function describeArc(x, y, radius, startAngle, endAngle) {
-    var start = polarToCartesian(x, y, radius, endAngle);
-    var end = polarToCartesian(x, y, radius, startAngle);
-
-    var largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-
-    var d = [
-        'M',
-        start.x,
-        start.y,
-        'A',
-        radius,
-        radius,
-        0,
-        largeArcFlag,
-        0,
-        end.x,
-        end.y
-    ].join(' ');
-
-    return d;
-}
-
-// From StackOverflow: https://stackoverflow.com/questions/10756313/javascript-jquery-map-a-range-of-numbers-to-another-range-of-numbers
-function mapNumber(number, in_min, in_max, out_min, out_max) {
-    return (
-        ((number - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min
-    );
 }
 
 export default Countdown;

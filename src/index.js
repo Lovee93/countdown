@@ -6,7 +6,7 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Countdown deadline="Apr 14, 2020 00:00:00"/>
+    <Countdown />
   </React.StrictMode>,
   document.getElementById('root')
 );
