@@ -35,8 +35,6 @@ class Countdown extends Component {
   }
 
   updateTimer = () => {
-    var { days, hours, minutes, seconds } = this.state;
-
     var now = new Date().getTime();
     var distance = this.state.newDate - now;
 
@@ -56,9 +54,10 @@ class Countdown extends Component {
       <div className="App">
         <header className="App-header">
           <h1>Time Left</h1>
+          <div className="heart is_animate"></div>
           <div className="clock-input">
             <input type="date" name="time-to" className="time-to" id="time-to" value={dateFormat(newDate, 'yyyy-mm-dd')} onChange={(event) => this.calcTime(event)} />
-          </div> <br/><br/>
+          </div> <br/>
           <div className="wrapper"> 
             <div className="clock-column">
               <p className="clock-day clock-timer">{newDate>now ? days : 'D'}</p>
